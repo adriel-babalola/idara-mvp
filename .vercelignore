@@ -1,0 +1,15 @@
+# Dependencies
+node_modules
+
+# Dev/editor files
+.vscode
+.idea
+*.local
+.env
+
+# Large model files (downloaded at runtime from HuggingFace)
+public/models/
+
+# Misc
+*.log
+.DS_Store
