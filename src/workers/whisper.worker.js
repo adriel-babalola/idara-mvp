@@ -1,7 +1,8 @@
 import { pipeline, env } from '@huggingface/transformers';
 
-// Skip local model checks, download from HF Hub
-env.allowLocalModels = false;
+// Configure environment
+env.allowLocalModels = false; // Set to true if we download models locally
+env.useBrowserCache = true;
 
 class TranscriptionPipeline {
     static task = 'automatic-speech-recognition';
@@ -12,8 +13,8 @@ class TranscriptionPipeline {
         if (this.instance === null) {
             this.instance = await pipeline(this.task, this.model, {
                 progress_callback,
-                dtype: 'q8',          // quantized for faster download & inference
-                device: 'wasm',       // explicit WASM backend
+                dtype: 'q8',          // Explicitly use 8-bit quantization for mobile performance
+                device: 'wasm',       // Explicit WASM backend
             });
         }
         return this.instance;
@@ -23,8 +24,8 @@ class TranscriptionPipeline {
 self.addEventListener('message', async (event) => {
     const { type, audio } = event.data;
 
-    if (type === 'load') {
-        try {
+    try {
+        if (type === 'load') {
             await TranscriptionPipeline.getInstance((data) => {
                 self.postMessage({
                     type: 'download',
@@ -32,17 +33,16 @@ self.addEventListener('message', async (event) => {
                 });
             });
             self.postMessage({ type: 'ready' });
-        } catch (error) {
-            console.error(error);
-            self.postMessage({ type: 'error', error: error.message });
         }
-    } else if (type === 'transcribe') {
-        let transcriber = await TranscriptionPipeline.getInstance();
+        else if (type === 'transcribe') {
+            let transcriber = await TranscriptionPipeline.getInstance();
 
-        try {
             const output = await transcriber(audio, {
                 chunk_length_s: 30,
                 stride_length_s: 5,
+                return_timestamps: true, // Useful for UI syncing later
+                language: 'en',
+                task: 'transcribe',
                 callback_function: (item) => {
                     self.postMessage({
                         type: 'partial',
@@ -55,9 +55,12 @@ self.addEventListener('message', async (event) => {
                 type: 'complete',
                 data: output
             });
-        } catch (error) {
-            console.error(error);
-            self.postMessage({ type: 'error', error: error.message });
         }
+    } catch (error) {
+        console.error('Whisper worker error:', error);
+        self.postMessage({
+            type: 'error',
+            error: error.message || 'Unknown worker error'
+        });
     }
 });

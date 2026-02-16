@@ -1,22 +1,20 @@
+import { audioGraph } from './audioGraph';
+
 export class AudioRecorder {
     constructor() {
         this.mediaRecorder = null;
         this.audioChunks = [];
-        this.stream = null;
         this.onDataAvailable = null;
+        this.isInitialized = false;
     }
 
     async initialize() {
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 16000
-                }
-            });
+            if (this.isInitialized) return;
 
-            this.mediaRecorder = new MediaRecorder(this.stream, {
+            const { processedStream } = await audioGraph.initialize();
+
+            this.mediaRecorder = new MediaRecorder(processedStream, {
                 mimeType: 'audio/webm;codecs=opus'
             });
 
@@ -28,10 +26,16 @@ export class AudioRecorder {
                     }
                 }
             };
+
+            this.isInitialized = true;
         } catch (error) {
             console.error('Error initializing audio recorder:', error);
             throw new Error('Microphone access denied or not available');
         }
+    }
+
+    getAnalyserData(dataArray) {
+        return audioGraph.getAnalyserData(dataArray);
     }
 
     start(timeSlice = 1000) {
@@ -63,12 +67,20 @@ export class AudioRecorder {
                 const audioBlob = new Blob(this.audioChunks, {
                     type: 'audio/webm;codecs=opus'
                 });
-                this.stream.getTracks().forEach(track => track.stop());
+                // We do NOT stop the tracks here anymore because the graph manages them.
+                // We might want to keep the graph alive for visualization even when not recording.
+                // However, for battery life optimizations, we should probably have a distinct cleanup method.
                 resolve(audioBlob);
             };
 
             this.mediaRecorder.stop();
         });
+    }
+
+    cleanup() {
+        audioGraph.cleanup();
+        this.isInitialized = false;
+        this.mediaRecorder = null;
     }
 }
 

@@ -80,6 +80,10 @@ export function useAudioRecorder() {
         return `${hrs > 0 ? `${hrs}:` : ''}${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
+    const getAnalyserData = (dataArray) => {
+        return audioRecorder.getAnalyserData(dataArray);
+    };
+
     return {
         isRecording,
         isPaused,
@@ -88,6 +92,7 @@ export function useAudioRecorder() {
         startRecording,
         stopRecording,
         togglePause,
-        permissionError
+        permissionError,
+        getAnalyserData
     };
 }

@@ -1,21 +1,53 @@
 {
     "name": "Idara - AI Lecture Companion",
     "short_name": "Idara",
-    "start_url": ".",
+    "description": "Your smart lecture recording and study assistant",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#4f46e5",
-    "description": "AI-powered lecture recording, transcription, notes, and video generation.",
+    "theme_color": "#3b82f6",
+    "orientation": "portrait",
     "icons": [
         {
-            "src": "icons/icon-192.png",
+            "src": "/icons/icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
-            "src": "icons/icon-512.png",
+            "src": "/icons/icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "share_target": {
+        "action": "/share",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "files": [
+                {
+                    "name": "audio",
+                    "accept": [
+                        "audio/*"
+                    ]
+                }
+            ]
+        }
+    },
+    "shortcuts": [
+        {
+            "name": "New Recording",
+            "short_name": "Record",
+            "description": "Start a new lecture recording",
+            "url": "/record",
+            "icons": [
+                {
+                    "src": "/icons/record.png",
+                    "sizes": "96x96"
+                }
+            ]
         }
     ]
 }
