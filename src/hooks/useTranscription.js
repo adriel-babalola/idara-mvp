@@ -92,10 +92,12 @@ export function useTranscription() {
                 // Xenova might handle context? sticking to simple clear.
                 samples = new Float32Array(0);
 
-                whisperService.worker.postMessage({
-                    type: 'transcribe',
-                    audio: chunk
-                });
+                if (whisperService.worker && whisperService.isReady) {
+                    whisperService.worker.postMessage({
+                        type: 'transcribe',
+                        audio: chunk
+                    });
+                }
             }
         };
     };

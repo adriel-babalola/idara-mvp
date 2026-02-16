@@ -112,7 +112,7 @@ export default function AudioRecorder() {
     };
 
     return (
-        <div className="relative h-[80vh] w-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl overflow-hidden shadow-2xl border border-white/50">
+        <div className="relative h-[80vh] w-full flex flex-col lg:flex-row bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl overflow-hidden shadow-2xl border border-white/50">
 
             {/* Background Visualizer */}
             <motion.div
@@ -123,52 +123,55 @@ export default function AudioRecorder() {
                 transition={{ type: "tween", ease: "linear", duration: 0.1 }}
             />
 
-            {/* Header / Status */}
-            <div className="relative z-10 flex items-center justify-between p-6">
-                <div className="flex items-center gap-3">
-                    {isRecording && (
-                        <motion.div
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-red-500 shadow-sm"
-                        >
-                            <Loader2 size={16} className="animate-spin" />
-                            <span className="text-sm font-bold tracking-wide">REC</span>
-                            <span className="font-mono text-gray-700 w-16 text-right">{formatDuration(duration)}</span>
-                        </motion.div>
+            {/* Left Side: Header + Transcript */}
+            <div className="relative z-10 flex-1 flex flex-col w-full lg:w-1/2">
+                {/* Header / Status */}
+                <div className="flex items-center justify-between p-4 lg:p-6 border-b lg:border-b-0 lg:border-r border-white/30">
+                    <div className="flex items-center gap-3">
+                        {isRecording && (
+                            <motion.div
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-red-500 shadow-sm"
+                            >
+                                <Loader2 size={16} className="animate-spin" />
+                                <span className="text-sm font-bold tracking-wide">REC</span>
+                                <span className="font-mono text-gray-700 w-16 text-right">{formatDuration(duration)}</span>
+                            </motion.div>
+                        )}
+                    </div>
+
+                    <div className="text-xs lg:text-sm font-medium text-gray-500 bg-white/50 px-2 lg:px-3 py-1 rounded-full backdrop-blur-sm">
+                        {transcriberStatus}
+                    </div>
+                </div>
+
+                {/* Live Transcript Area */}
+                <div className="relative flex-1 px-4 lg:px-6 py-4 overflow-y-auto mask-gradient-b">
+                    {transcript ? (
+                        <div className="space-y-4">
+                            <p className="text-lg lg:text-xl font-medium leading-relaxed text-gray-800 tracking-wide">
+                                {transcript}
+                                {isRecording && !isPaused && (
+                                    <motion.span
+                                        animate={{ opacity: [0, 1, 0] }}
+                                        transition={{ repeat: Infinity, duration: 1 }}
+                                        className="inline-block w-2 h-5 bg-blue-500 ml-1 align-middle"
+                                    />
+                                )}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
+                            <Mic size={48} className="opacity-20" />
+                            <p className="text-lg">Tap the microphone to start your lecture</p>
+                        </div>
                     )}
                 </div>
-
-                <div className="text-sm font-medium text-gray-500 bg-white/50 px-3 py-1 rounded-full backdrop-blur-sm">
-                    {transcriberStatus}
-                </div>
             </div>
 
-            {/* Live Transcript Area */}
-            <div className="relative z-10 flex-1 px-6 py-4 overflow-y-auto mask-gradient-b">
-                {transcript ? (
-                    <div className="space-y-4">
-                        <p className="text-xl md:text-2xl font-medium leading-relaxed text-gray-800 tracking-wide">
-                            {transcript}
-                            {isRecording && !isPaused && (
-                                <motion.span
-                                    animate={{ opacity: [0, 1, 0] }}
-                                    transition={{ repeat: Infinity, duration: 1 }}
-                                    className="inline-block w-2 h-5 bg-blue-500 ml-1 align-middle"
-                                />
-                            )}
-                        </p>
-                    </div>
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
-                        <Mic size={48} className="opacity-20" />
-                        <p className="text-lg">Tap the microphone to start your lecture</p>
-                    </div>
-                )}
-            </div>
-
-            {/* Controls */}
-            <div className="relative z-20 p-8 flex flex-col items-center justify-center pb-12">
+            {/* Right Side: Controls */}
+            <div className="relative z-20 w-full lg:w-1/2 p-6 lg:p-8 flex flex-col items-center justify-center">
 
                 <div className="flex items-center gap-8">
                     {/* Pause Button (Only when recording) */}
