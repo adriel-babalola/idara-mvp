@@ -6,13 +6,15 @@ export class AudioRecorder {
         this.audioChunks = [];
         this.onDataAvailable = null;
         this.isInitialized = false;
+        this.stream = null; // Store original stream for live transcription
     }
 
     async initialize() {
         try {
             if (this.isInitialized) return;
 
-            const { processedStream } = await audioGraph.initialize();
+            const { processedStream, originalStream } = await audioGraph.initialize();
+            this.stream = originalStream; // Store for live transcription access
 
             this.mediaRecorder = new MediaRecorder(processedStream, {
                 mimeType: 'audio/webm;codecs=opus'

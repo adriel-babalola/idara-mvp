@@ -15,8 +15,18 @@ export function useTranscription() {
         // Initialize service
         whisperService.onStatusUpdate = (msg) => setStatus(msg);
         whisperService.onTranscriptionUpdate = (text, isFinal) => {
-            setTranscript(prev => isFinal ? prev + ' ' + text : prev);
-            // For real-time partials we might act differently, but simplified for now
+            console.log('Transcription update:', { text, isFinal });
+            if (text && text.trim()) {
+                setTranscript(prev => {
+                    // For partials: replace the current line, for final: append
+                    if (isFinal) {
+                        return prev ? prev + ' ' + text.trim() : text.trim();
+                    } else {
+                        // Show live partial text
+                        return prev ? prev.split('\n')[0] + ' ' + text.trim() : text.trim();
+                    }
+                });
+            }
         };
 
         const init = async () => {
@@ -40,7 +50,10 @@ export function useTranscription() {
     }, []);
 
     const startLiveTranscription = async () => {
-        if (!audioRecorder.stream || !isReady) return;
+        if (!audioRecorder.stream || !isReady) {
+            console.warn('Transcription not ready - stream:', !!audioRecorder.stream, 'ready:', isReady);
+            return;
+        }
 
         // Create AudioContext to capture raw audio
         const AudioContext = window.AudioContext || window.webkitAudioContext;

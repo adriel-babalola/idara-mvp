@@ -293,3 +293,4 @@ This project is open source and available under the [MIT License](LICENSE).
   Built with ❤️ during a hackathon by <strong>Team Idara</strong><br/>
   <em>Because every lecture deserves to be remembered.</em>
 </p>
+|

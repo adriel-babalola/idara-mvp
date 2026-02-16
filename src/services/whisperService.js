@@ -36,13 +36,16 @@ export class WhisperService {
 
                 case 'partial':
                     // partial transcription update
-                    // usually struct is { text: "..." }
-                    if (this.onTranscriptionUpdate) this.onTranscriptionUpdate(data.text || '', false);
+                    console.log('Partial transcription received:', data);
+                    const partialText = typeof data === 'string' ? data : (data.text || '');
+                    if (this.onTranscriptionUpdate) this.onTranscriptionUpdate(partialText, false);
                     break;
 
                 case 'complete':
                     // final transcription
-                    if (this.onTranscriptionUpdate) this.onTranscriptionUpdate(data.text || '', true);
+                    console.log('Complete transcription received:', data);
+                    const completeText = typeof data === 'string' ? data : (data.text || '');
+                    if (this.onTranscriptionUpdate) this.onTranscriptionUpdate(completeText, true);
                     break;
 
                 case 'error':
